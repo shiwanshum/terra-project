@@ -201,3 +201,56 @@ resource "aws_security_group" "web_sg" {
     Name = "web_sg" 
   }
 }
+
+## Creating rds db instance
+
+resource "aws_db_instance" "rds" {
+  allocated_storage        = 10
+  engine                   = "mysql"
+  engine_version           = "5.7"
+  instance_class           = "db.t2.micro"
+  name                     = "mydb"
+  username                 = "admin"
+  password                 = "admin4321"
+  parameter_group_name     = "default.mysql5.7"
+  db_subnet_group_name     = "${aws_db_subnet_group.rds.id}"
+  auto_minor_version_upgrade = false
+  skip_final_snapshot      =  true
+
+}
+
+## DB subnet group
+
+resource "aws_db_subnet_group" "rds" {
+  name       = "main"
+  subnet_ids = "${local.pri_sub_ids}"
+
+  tags = {
+    Name = "My DB subnet group"
+  }
+}
+
+## rds db security group
+
+resource "aws_security_group" "rds_sg" {
+  name        = "rds_sg"
+  description = "Allow traffic for rds"
+  vpc_id      = "${aws_vpc.my_vpc.id}"
+
+   ingress  {
+      from_port        = 3306
+      to_port          = 3306
+      protocol         = "tcp"
+      security_groups  = ["${aws_security_group.web_sg.id}"]
+  }  
+   egress  {
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = ["0.0.0.0/0"]
+  }   
+
+  tags = {
+    Name = "rds_sg" 
+  }
+}
