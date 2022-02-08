@@ -102,7 +102,7 @@ resource "aws_instance" "nat" {
   subnet_id              =   "${local.pub_sub_ids[0]}"
   source_dest_check      =    false
   vpc_security_group_ids =   ["${aws_security_group.nat_sg.id}"]
-  key_name               =   "keerthi"
+  key_name               =   "test"
  
 
   tags = {
